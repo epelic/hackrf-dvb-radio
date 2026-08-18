@@ -6,7 +6,7 @@
 
 Windows application for creating and transmitting a radio-only DVB-T multiplex with a HackRF One. Each audio source becomes a separate DVB service with its own service name and configurable logical channel number (LCN).
 
-The current tested release is **0.2.11**. Its default RF profile is 474 MHz, 8 MHz, 8K, 16-QAM, FEC 1/2 and guard interval 1/4. The application also supports 5/6/7/8 MHz channels, 2K/8K modes, QPSK/16-QAM/64-QAM, selectable FEC and guard interval, with automatic capacity recalculation. The capacity display separates the theoretical DVB-T bitrate from a 70% stable live-pipeline limit and blocks configurations exceeding that practical ceiling.
+The current tested release is **0.3.1**. Its default RF profile is 474 MHz, 8 MHz, 8K, 16-QAM, FEC 1/2 and guard interval 1/4. The application also supports 5/6/7/8 MHz channels, 2K/8K modes, QPSK/16-QAM/64-QAM, selectable FEC and guard interval, with automatic capacity recalculation. The capacity display separates the theoretical DVB-T bitrate from a 70% stable live-pipeline limit and blocks configurations exceeding that practical ceiling.
 
 ## Features
 
