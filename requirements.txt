@@ -1,0 +1,1 @@
+# La GUI usa solo la libreria standard. GNU Radio/HackRF sono forniti da Radioconda.
