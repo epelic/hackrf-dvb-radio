@@ -8,7 +8,7 @@ from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 
 from .config import Config, Station
-from .engine import build_transport_stream, dvbt_bitrate, resource_path, start_transmitter, tool_status, user_data_dir
+from .engine import build_transport_stream, dvbt_bitrate, resource_path, start_transmitter, tool_status, usable_mux_bitrate, user_data_dir
 
 
 class App(tk.Tk):
@@ -111,11 +111,15 @@ class App(tk.Tk):
         # Margine conservativo del 10% per PES/TS e PSI/SI.
         estimated = int(total * 1.10 + 96)
         preview = Config(bandwidth_mhz=int(self.bandwidth.get()), transmission_mode=self.mode.get(), constellation=self.constellation.get(), fec=self.fec.get(), guard_interval=self.guard.get())
-        capacity = dvbt_bitrate(preview) / 1000
+        theoretical = dvbt_bitrate(preview) / 1000
+        capacity = usable_mux_bitrate(preview) / 1000
         percent = min(999, estimated * 100 / capacity)
         self.capacity_percent = percent
         self.capacity_segments = segments
-        self.capacity.set(f"Capacità stimata: {estimated / 1000:.2f} / {capacity / 1000:.2f} Mbit/s ({percent:.0f}%)")
+        self.capacity.set(
+            f"Carico stabile: {estimated / 1000:.2f} / {capacity / 1000:.2f} Mbit/s ({percent:.0f}%)"
+            f" · capacità DVB-T teorica {theoretical / 1000:.2f} Mbit/s"
+        )
         self._draw_capacity_bar()
 
     def _draw_capacity_bar(self):
@@ -125,7 +129,7 @@ class App(tk.Tk):
         percent = self.capacity_percent
         canvas.create_rectangle(0, 0, width, height, fill="#303640", outline="")
         self.capacity_hitboxes = []
-        capacity_kbps = max(1, dvbt_bitrate(Config(bandwidth_mhz=int(self.bandwidth.get()), transmission_mode=self.mode.get(), constellation=self.constellation.get(), fec=self.fec.get(), guard_interval=self.guard.get())) / 1000)
+        capacity_kbps = max(1, usable_mux_bitrate(Config(bandwidth_mhz=int(self.bandwidth.get()), transmission_mode=self.mode.get(), constellation=self.constellation.get(), fec=self.fec.get(), guard_interval=self.guard.get())) / 1000)
         x = 0.0
         overhead_width = width * min(96 / capacity_kbps, 1)
         canvas.create_rectangle(x, 0, x + overhead_width, height, fill="#34506f", outline="#ffffff")
