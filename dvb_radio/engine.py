@@ -12,6 +12,12 @@ from xml.sax.saxutils import escape
 from .config import Config, Station
 
 
+# A live multiplex needs headroom for PSI/SI repetition, PES/TS packetisation,
+# encoder rate variation and bursty network inputs.  Above 70% of the nominal
+# DVB-T payload rate the current Windows pipeline is no longer reliably smooth.
+USABLE_MUX_RATIO = 0.70
+
+
 def dvbt_bitrate(config: Config) -> int:
     bits = {"QPSK": 2, "16-QAM": 4, "64-QAM": 6}[config.constellation]
     fec_num, fec_den = (int(x) for x in config.fec.split("/"))
@@ -20,6 +26,11 @@ def dvbt_bitrate(config: Config) -> int:
     rate = (config.bandwidth_mhz * 1_000_000 * 8 / 7) * (carriers / fft)
     rate *= bits * (fec_num / fec_den) * (188 / 204) * (gi_den / (gi_den + gi_num))
     return round(rate)
+
+
+def usable_mux_bitrate(config: Config) -> int:
+    """Practical payload ceiling for stable live transmission."""
+    return round(dvbt_bitrate(config) * USABLE_MUX_RATIO)
 
 
 def application_root() -> Path:
@@ -168,8 +179,14 @@ def _ffmpeg_command(config: Config, active: list[Station], destination: str, dur
     if [s.pmt_pid for s in active] != list(range(pmt_start, pmt_start + len(active))):
         raise ValueError("In questa milestone i PMT PID devono essere consecutivi")
     mux_rate = dvbt_bitrate(config)
-    if sum(s.bitrate_kbps for s in active) * 1150 + 100_000 > mux_rate:
-        raise ValueError(f"Le radio superano la capacità del profilo DVB-T ({mux_rate / 1e6:.2f} Mbit/s)")
+    estimated_rate = sum(s.bitrate_kbps for s in active) * 1100 + 96_000
+    usable_rate = usable_mux_bitrate(config)
+    if estimated_rate > usable_rate:
+        raise ValueError(
+            "Le radio superano il limite stabile del profilo DVB-T "
+            f"({estimated_rate / 1e6:.2f} richiesti, {usable_rate / 1e6:.2f} Mbit/s utilizzabili; "
+            f"capacità teorica {mux_rate / 1e6:.2f} Mbit/s)"
+        )
     cmd += ["-metadata", f"service_provider={config.provider_name}", "-mpegts_transport_stream_id", str(config.transport_stream_id), "-mpegts_original_network_id", str(config.original_network_id), "-mpegts_pmt_start_pid", str(pmt_start), "-mpegts_flags", "+nit+resend_headers", "-muxrate", str(mux_rate), "-pat_period", "0.1", "-sdt_period", "0.5", "-nit_period", "0.5"]
     if duration is not None:
         cmd += ["-t", str(duration)]
