@@ -4,11 +4,14 @@ import subprocess
 import threading
 import time
 import tkinter as tk
+import webbrowser
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 
 from .config import Config, Station
 from .engine import build_transport_stream, dvbt_bitrate, resource_path, start_transmitter, tool_status, usable_mux_bitrate, user_data_dir
+
+APP_VERSION = "0.2.11"
 
 
 class App(tk.Tk):
@@ -78,6 +81,7 @@ class App(tk.Tk):
         ttk.Button(buttons, text="Salva", command=self.save).pack(side="left", padx=5)
         ttk.Button(buttons, text="Verifica multiplex", command=self.prepare).pack(side="left", padx=(25, 5))
         self.tx_button = ttk.Button(buttons, text="Avvia trasmissione RF", command=self.toggle_tx); self.tx_button.pack(side="left", padx=5)
+        ttk.Button(buttons, text="INFO", command=self.show_info).pack(side="right")
         self.status = tk.StringVar(value="Pronto — la trasmissione RF è spenta")
         ttk.Label(self, textvariable=self.status, padding=(10, 3)).pack(fill="x")
         self.capacity = tk.StringVar(value="")
@@ -93,6 +97,30 @@ class App(tk.Tk):
         self.capacity_detail = tk.StringVar(value="Passa il mouse sui segmenti per vedere i singoli servizi")
         ttk.Label(self, textvariable=self.capacity_detail, padding=(10, 0, 10, 5)).pack(fill="x")
         self.tree.bind("<<TreeviewSelect>>", lambda _e: self.update_capacity())
+
+    def show_info(self):
+        window = tk.Toplevel(self)
+        window.title("DVB Radio — Info")
+        window.configure(background="#171a1f")
+        window.resizable(False, False)
+        window.transient(self)
+        window.grab_set()
+        icon = resource_path("assets/app.ico")
+        if icon.exists():
+            window.iconbitmap(default=str(icon))
+        logo = resource_path("assets/app.png")
+        if logo.exists():
+            self._info_logo = tk.PhotoImage(file=str(logo)).subsample(3, 3)
+            ttk.Label(window, image=self._info_logo).pack(padx=32, pady=(24, 8))
+        ttk.Label(window, text="DVB Radio", font=("Segoe UI", 18, "bold")).pack(padx=32)
+        ttk.Label(window, text=f"Version {APP_VERSION}", font=("Segoe UI", 10)).pack(pady=(3, 14))
+        ttk.Label(window, text="Copyright © 2026 SatWolf").pack()
+        website = tk.Label(window, text="www.freewaves.it", background="#171a1f", foreground="#69b7ff", cursor="hand2", font=("Segoe UI", 10, "underline"))
+        website.pack(pady=(5, 18))
+        website.bind("<Button-1>", lambda _e: webbrowser.open("https://www.freewaves.it"))
+        ttk.Button(window, text="OK", command=window.destroy).pack(pady=(0, 20))
+        window.update_idletasks()
+        window.geometry(f"+{self.winfo_rootx() + (self.winfo_width() - window.winfo_width()) // 2}+{self.winfo_rooty() + (self.winfo_height() - window.winfo_height()) // 2}")
 
     def _load_rows(self):
         self.tree.delete(*self.tree.get_children())

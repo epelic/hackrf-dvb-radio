@@ -1,5 +1,5 @@
 #define MyAppName "HackRF DVB Radio"
-#define MyAppVersion "0.2.9"
+#define MyAppVersion "0.2.11"
 #define MyAppExeName "HackRFDVBRadio.exe"
 
 [Setup]
@@ -9,7 +9,7 @@ AppVersion={#MyAppVersion}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 OutputDir=outputs
-OutputBaseFilename=HackRF-DVB-Radio-Setup-0.2.9
+OutputBaseFilename=HackRF-DVB-Radio-Setup-0.2.11
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern

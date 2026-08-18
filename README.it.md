@@ -6,7 +6,7 @@
 
 Applicazione Windows per creare e trasmettere con HackRF One un multiplex DVB-T contenente esclusivamente servizi radio. Ogni sorgente audio diventa un servizio DVB distinto, con nome e numero logico LCN configurabili.
 
-La versione verificata è la **0.2.9**. Il profilo RF predefinito è 474 MHz, 8 MHz, 8K, 16-QAM, FEC 1/2 e intervallo di guardia 1/4. Sono selezionabili anche banda 5/6/7/8 MHz, modalità 2K/8K, QPSK/16-QAM/64-QAM, FEC e intervallo di guardia, con ricalcolo automatico della capacità. L'indicatore distingue il bitrate DVB-T teorico dal limite stabile della pipeline live, fissato al 70%, e impedisce l'avvio quando la configurazione supera tale soglia pratica.
+La versione verificata è la **0.2.11**. Il profilo RF predefinito è 474 MHz, 8 MHz, 8K, 16-QAM, FEC 1/2 e intervallo di guardia 1/4. Sono selezionabili anche banda 5/6/7/8 MHz, modalità 2K/8K, QPSK/16-QAM/64-QAM, FEC e intervallo di guardia, con ricalcolo automatico della capacità. L'indicatore distingue il bitrate DVB-T teorico dal limite stabile della pipeline live, fissato al 70%, e impedisce l'avvio quando la configurazione supera tale soglia pratica.
 
 ## Funzioni
 
@@ -26,7 +26,7 @@ L'architettura è predisposta per un futuro singolo servizio TV, ma in questa ve
 
 ## Avvio rapido
 
-1. Scaricare ed eseguire `HackRF-DVB-Radio-Setup-0.2.9.exe` dalla release GitHub.
+1. Scaricare ed eseguire `HackRF-DVB-Radio-Setup-0.2.11.exe` dalla release GitHub.
 2. Tenere disponibile una connessione Internet mentre il setup installa FFmpeg, TSDuck e Radioconda (GNU Radio, gr-dtv e SoapyHackRF).
 3. Collegare HackRF One e avviare l'applicazione.
 4. Fare doppio clic sulle celle delle stazioni per modificare nome, LCN, sorgente e identificativi.
